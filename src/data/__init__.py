@@ -1,30 +1,43 @@
 import subprocess
+import time
 import os
 
-def run_command(command):
-    """Executa um comando e exibe a saída."""
-    try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+def run_script(script_name):
+    """Executa um script Python."""
+    result = subprocess.run(["python", script_name], capture_output=True, text=True)
+    return result.stdout
 
-        # Se o código de retorno for diferente de zero, houve erro
-        if result.returncode != 0:
-            print("Erro ao executar o comando:", result.stderr)
-            return False
-        
-        print("Saída do comando:", result.stdout)
-        return True
+def main():
+
+    os.system("cls")
+
+    resultados_finais = {}
     
-    except Exception as e:
-        print("Erro inesperado:", e)
-        return False
+    for i in range(1, 4):  # Executar três vezes
+        print(f"Exe: {i}...")
+        run_script("netsh.py")  # Executa o primeiro script
+        time.sleep(2)  # Aguarda um pouco para garantir a escrita
+        resultado = run_script("read.py")  # Executa o segundo script
+        run_script("delete.py")  # Executa o terceiro script
+        time.sleep(2)  # Aguarda um pouco para garantir a exclusão
+        
+        # Processa a saída do segundo script
+        dados = {}
+        for linha in resultado.split("\n"):
+            if ":" in linha:
+                chave, valor = linha.split(":")
+                dados[chave.strip()] = valor.strip()
+        
+        resultados_finais[f"Exe: {i}"] = dados
+    
+    with open("resultados.txt", "w") as arquivo:
+        arquivo.write("Resultados finais:\n")
+        for execucao, dados in resultados_finais.items():
+            arquivo.write(f"{execucao}: {dados}\n")
 
-# Caminho absoluto do script
-script_path = os.path.abspath("data/run.py")  # Ajuste se necessário
+    # print("Resultados finais:")
+    # for execucao, dados in resultados_finais.items():
+    #     print(execucao, dados)
 
-# Executa o comando com aspas duplas para lidar com espaços no caminho
-command = f'python "{script_path}"'  
-
-if run_command(command):
-    print("Comando executado com sucesso.")
-else:
-    print("Falha ao executar o comando.")
+if __name__ == "__main__":
+    main()

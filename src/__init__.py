@@ -2,6 +2,8 @@ import subprocess
 import time
 import os
 
+pwd = "./data/"
+
 def run_script(script_name):
     """Executa um script Python."""
     result = subprocess.run(["python", script_name], capture_output=True, text=True)
@@ -15,10 +17,10 @@ def main():
     
     for i in range(1, 4):  # Executar três vezes
         print(f"Exe: {i}...")
-        run_script("netsh.py")  # Executa o primeiro script
+        run_script(f"{pwd}netsh.py")  # Executa o primeiro script
         time.sleep(2)  # Aguarda um pouco para garantir a escrita
-        resultado = run_script("read.py")  # Executa o segundo script
-        run_script("delete.py")  # Executa o terceiro script
+        resultado = run_script(f"{pwd}read.py")  # Executa o segundo script
+        run_script(f"{pwd}delete.py")  # Executa o terceiro script
         time.sleep(2)  # Aguarda um pouco para garantir a exclusão
         
         # Processa a saída do segundo script
